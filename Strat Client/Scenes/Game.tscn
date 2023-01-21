@@ -1,0 +1,48 @@
+[gd_scene load_steps=4 format=2]
+
+[ext_resource path="res://Scenes/Map/Map.tscn" type="PackedScene" id=1]
+[ext_resource path="res://Scenes/Player/Player.tscn" type="PackedScene" id=2]
+
+[sub_resource type="GDScript" id=1]
+script/source = "extends Node2D
+
+func _ready():
+	get_tree().connect(\"connected_to_server\", self, \"ok_connect\")
+	get_tree().connect(\"connection_failed\", self, \"failed_connect\")
+	
+	var net = NetworkedMultiplayerENet.new()
+	
+	net.create_client(Global.settings[\"adress\"][0], Global.settings[\"adress\"][1])
+	get_tree().network_peer = net
+func ok_connect():
+	print(\"I_CONNECT - \"+str(Global.settings[\"my_name\"])+\" (\"+str(get_tree().get_network_unique_id())+\")\")
+	Global.rpc_id(1, \"i_connect\", get_tree().get_network_unique_id(), Global.settings[\"my_name\"])
+func failed_connect():
+	get_tree().network_peer = null
+	get_tree().change_scene(\"res://AdminPanel.tscn\")
+"
+
+[node name="Game" type="Node2D"]
+script = SubResource( 1 )
+
+[node name="Player" parent="." instance=ExtResource( 2 )]
+position = Vector2( -53, 52 )
+
+[node name="Map" parent="." instance=ExtResource( 1 )]
+
+[node name="Ground" parent="Map" index="0"]
+tile_data = PoolIntArray(  )
+
+[node name="Buildings" parent="Map" index="1"]
+tile_data = PoolIntArray(  )
+
+[node name="Countries" parent="Map" index="2"]
+tile_data = PoolIntArray( 327666, 1, 0, 327669, 1, 0, 327672, 1, 0, 327677, 1, 0, 327678, 1, 0, 262145, 1, 0, 262148, 1, 0, 393203, 1, 0, 393205, 1, 0, 393207, 1, 0, 393212, 1, 0, 393214, 1, 0, 327681, 1, 0, 327684, 1, 0, 458740, 1, 0, 458741, 1, 0, 458742, 1, 0, 458748, 1, 0, 458750, 1, 0, 393217, 1, 0, 393219, 1, 0, 393220, 1, 0, 524276, 1, 0, 524277, 1, 0, 524278, 1, 0, 524283, 1, 0, 524286, 1, 0, 458753, 1, 0, 458754, 1, 0, 458755, 1, 0, 458756, 1, 0, 589811, 1, 0, 589813, 1, 0, 589815, 1, 0, 589818, 1, 0, 589819, 1, 0, 589820, 1, 0, 589821, 1, 0, 589822, 1, 0, 589823, 1, 0, 524289, 1, 0, 524290, 1, 0, 524292, 1, 0, 655346, 1, 0, 655349, 1, 0, 655352, 1, 0, 655354, 1, 0, 655359, 1, 0, 589825, 1, 0, 589828, 1, 0, 589830, 4, 0, 589832, 3, 0, 589834, 0, 0 )
+
+[node name="Timer" parent="Map" index="4"]
+wait_time = 1.0
+
+[node name="*Sample" parent="Map" index="5"]
+visible = false
+
+[editable path="Map"]

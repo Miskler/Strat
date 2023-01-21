@@ -1,0 +1,237 @@
+[gd_scene load_steps=15 format=2]
+
+[ext_resource path="res://Scenes/Global/Global.gd" type="Script" id=1]
+[ext_resource path="res://Fifaks10Dev1.ttf" type="DynamicFontData" id=2]
+[ext_resource path="res://Scenes/Global/Main.gd" type="Script" id=3]
+[ext_resource path="res://Scenes/Global/Transition.gd" type="Script" id=4]
+
+[sub_resource type="Shader" id=1]
+code = "// Pixel transition shader
+// Adapted from a shadertoy shader by iJ01 (https://www.shadertoy.com/view/Xl2SRd)
+
+shader_type canvas_item;
+
+float rand(vec2 co){
+    return fract(sin(dot(co.xy ,vec2(12.9898,96.233))) * 43758.5453);
+}
+uniform float time = 1.0;
+void fragment()
+{
+	vec2 iResolution = 1.0 / SCREEN_PIXEL_SIZE;
+	vec2 uv = FRAGCOORD.xy / iResolution.xy;
+    float resolution = 5.0;
+    vec2 lowresxy = vec2(
+    	floor(FRAGCOORD.x / resolution),
+    	floor(FRAGCOORD.y / resolution)
+    );
+    
+    if(sin(time) > rand(lowresxy)){
+		COLOR = vec4(0.0,0.0,0.0,1.0);
+    }else{
+		COLOR = vec4(0.0,0.0,0.0,0.0);
+		// change to COLOR = vec4(0.0,0.0,0.0,1.0); to make black pixels
+    } 
+}"
+
+[sub_resource type="ShaderMaterial" id=2]
+shader = SubResource( 1 )
+shader_param/time = 0.0
+
+[sub_resource type="Animation" id=3]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/path = NodePath("Rect:material:shader_param/time")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ 0.0 ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../Main:visible")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 1,
+"values": [ false ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("../Main:modulate")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0 ),
+"transitions": PoolRealArray( 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ) ]
+}
+
+[sub_resource type="Animation" id=4]
+resource_name = "def"
+tracks/0/type = "value"
+tracks/0/path = NodePath("../Main:visible")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 1,
+"values": [ false, true, true ]
+}
+tracks/1/type = "value"
+tracks/1/path = NodePath("../Main:modulate")
+tracks/1/interp = 1
+tracks/1/loop_wrap = true
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/keys = {
+"times": PoolRealArray( 0, 0.5, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 0 ), Color( 1, 1, 1, 1 ) ]
+}
+tracks/2/type = "value"
+tracks/2/path = NodePath("Rect:material:shader_param/time")
+tracks/2/interp = 1
+tracks/2/loop_wrap = true
+tracks/2/imported = false
+tracks/2/enabled = true
+tracks/2/keys = {
+"times": PoolRealArray( 0, 0.5, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 1.55, 1.55 ]
+}
+tracks/3/type = "value"
+tracks/3/path = NodePath("../Main/Box/Title:percent_visible")
+tracks/3/interp = 1
+tracks/3/loop_wrap = true
+tracks/3/imported = false
+tracks/3/enabled = true
+tracks/3/keys = {
+"times": PoolRealArray( 0, 0.5, 1 ),
+"transitions": PoolRealArray( 1, 1, 1 ),
+"update": 0,
+"values": [ 0.0, 0.0, 1.0 ]
+}
+
+[sub_resource type="DynamicFont" id=5]
+size = 100
+font_data = ExtResource( 2 )
+
+[sub_resource type="DynamicFont" id=15]
+size = 80
+font_data = ExtResource( 2 )
+
+[sub_resource type="StyleBoxFlat" id=13]
+bg_color = Color( 0.0470588, 0.0470588, 0.0470588, 1 )
+
+[sub_resource type="StyleBoxFlat" id=12]
+bg_color = Color( 0.0470588, 0.0470588, 0.0470588, 1 )
+border_width_left = 5
+border_width_top = 5
+border_color = Color( 1, 1, 1, 1 )
+
+[sub_resource type="StyleBoxFlat" id=14]
+bg_color = Color( 0, 0, 0, 1 )
+shadow_size = 11
+
+[sub_resource type="StyleBoxFlat" id=11]
+bg_color = Color( 0, 0, 0, 1 )
+
+[node name="Global" type="Node"]
+script = ExtResource( 1 )
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+layer = 2
+
+[node name="Transition" type="Control" parent="CanvasLayer"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+script = ExtResource( 4 )
+
+[node name="Rect" type="ColorRect" parent="CanvasLayer/Transition"]
+material = SubResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+mouse_filter = 2
+
+[node name="Animation" type="AnimationPlayer" parent="CanvasLayer/Transition"]
+anims/RESET = SubResource( 3 )
+anims/def = SubResource( 4 )
+
+[node name="Main" type="Control" parent="CanvasLayer"]
+visible = false
+modulate = Color( 1, 1, 1, 0 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+script = ExtResource( 3 )
+
+[node name="Box" type="VBoxContainer" parent="CanvasLayer/Main"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -223.0
+margin_top = -300.0
+margin_right = 223.0
+margin_bottom = 300.0
+alignment = 1
+
+[node name="Title" type="Label" parent="CanvasLayer/Main/Box"]
+margin_top = 139.0
+margin_right = 450.0
+margin_bottom = 239.0
+custom_fonts/font = SubResource( 5 )
+text = "Поражение"
+align = 1
+valign = 1
+
+[node name="Empty" type="Control" parent="CanvasLayer/Main/Box"]
+margin_top = 243.0
+margin_right = 450.0
+margin_bottom = 293.0
+rect_min_size = Vector2( 0, 50 )
+
+[node name="Still" type="Button" parent="CanvasLayer/Main/Box"]
+margin_top = 297.0
+margin_right = 450.0
+margin_bottom = 377.0
+focus_mode = 0
+custom_fonts/font = SubResource( 15 )
+custom_styles/hover = SubResource( 13 )
+custom_styles/pressed = SubResource( 12 )
+custom_styles/disabled = SubResource( 14 )
+custom_styles/normal = SubResource( 11 )
+enabled_focus_mode = 0
+text = "Остаться"
+
+[node name="In Menu" type="Button" parent="CanvasLayer/Main/Box"]
+margin_top = 381.0
+margin_right = 450.0
+margin_bottom = 461.0
+focus_mode = 0
+custom_fonts/font = SubResource( 15 )
+custom_styles/hover = SubResource( 13 )
+custom_styles/pressed = SubResource( 12 )
+custom_styles/disabled = SubResource( 14 )
+custom_styles/normal = SubResource( 11 )
+enabled_focus_mode = 0
+text = "В меню"
+
+[connection signal="animation_finished" from="CanvasLayer/Transition/Animation" to="CanvasLayer/Transition" method="animation_finished"]
+[connection signal="pressed" from="CanvasLayer/Main/Box/Still" to="CanvasLayer/Main" method="still_pressed"]
+[connection signal="pressed" from="CanvasLayer/Main/Box/In Menu" to="CanvasLayer/Main" method="in_menu_pressed"]

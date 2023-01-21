@@ -1,0 +1,455 @@
+[gd_scene load_steps=32 format=2]
+
+[ext_resource path="res://Resources/User Interface/UiIcons.png" type="Texture" id=1]
+[ext_resource path="res://Resources/kisspng-pixel-art-drawing-vector-graphics-royalty-free-thetimguy-amp-apos-s-profile-5b68a9a4d969b8.7827088715335858288905.png" type="Texture" id=2]
+[ext_resource path="res://Scenes/Player/ListOfActions.gd" type="Script" id=3]
+[ext_resource path="res://Scenes/Player/InterfaceScroll.tres.gd" type="Script" id=4]
+[ext_resource path="res://Scenes/Player/Plus.gd" type="Script" id=5]
+[ext_resource path="res://Scenes/Player/Minus.gd" type="Script" id=6]
+[ext_resource path="res://Resources/progress.png" type="Texture" id=7]
+[ext_resource path="res://Resources/ColoredBuildingsPreview.png" type="Texture" id=8]
+
+[sub_resource type="GDScript" id=4]
+script/source = "extends CanvasLayer
+
+var procent = 50
+
+
+func changed(value, mode = true):
+	if get_node(\"/root/Game/Map\").countries.has(Global.settings[\"my_name\"]):
+		procent = value
+		$Control/Scroll/Label.text = str(int((get_node(\"/root/Game/Map\").countries[Global.settings[\"my_name\"]][\"Gold\"]/100.0)*value))
+		if mode:
+			$Control/ListOfActions.hide()
+
+
+func _pressed():
+	get_tree().network_peer = null
+	Global.get_node(\"CanvasLayer/Transition\").reset_screen(\"res://Scenes/Main Menu/Menu.tscn\")
+
+func reqs_event(event):
+	changed(procent, false)
+	
+	for i in $Control/Reqs/Box.get_children():
+		if i.name != \"*Sample\":
+			i.queue_free()
+	
+	if event.has(Global.settings[\"my_name\"]):
+		for i in event[Global.settings[\"my_name\"]]:
+			var node = $\"Control/Reqs/Box/*Sample\".duplicate()
+			
+			node.get_node(\"Hou\").text = str(i[\"how_many\"])
+			
+			if i[\"recipient\"] == null:
+				node.get_node(\"Recipient\").text = \"Мирно \"
+			else:
+				node.get_node(\"Recipient\").text = str(i[\"recipient\"])
+			
+			var o = $Control/ListOfActions/Attack.texture_normal.duplicate(true)
+			
+			if i[\"type\"] == \"attack\":
+				node.get_node(\"AvatarMode\").texture = o
+			
+			node.show()
+			$Control/Reqs/Box.add_child(node)
+			
+			node.hou = i[\"how_many\"]
+			node.req = i[\"recipient\"]
+			node.type = i[\"type\"]
+			
+			node.connect(\"bust\", self, \"bust\")
+			node.connect(\"stop\", self, \"stop\")
+
+func bust(type, req, _hou):
+	var dat = $Control/ListOfActions.calculations()
+	Global.send_req(type, req, dat[1])
+
+func stop(type, req, hou):
+	Global.send_req(type, req, hou, true)
+"
+
+[sub_resource type="StyleBoxFlat" id=1]
+bg_color = Color( 0, 0, 0, 0.392157 )
+corner_radius_top_left = 30
+corner_radius_top_right = 30
+corner_radius_bottom_right = 30
+corner_radius_bottom_left = 30
+
+[sub_resource type="AtlasTexture" id=2]
+atlas = ExtResource( 1 )
+region = Rect2( 17, 1, 15, 15 )
+
+[sub_resource type="AtlasTexture" id=23]
+atlas = ExtResource( 8 )
+region = Rect2( 0, 0, 32, 33 )
+
+[sub_resource type="AtlasTexture" id=3]
+atlas = ExtResource( 2 )
+region = Rect2( 90, 90, 390, 390 )
+
+[sub_resource type="StyleBoxLine" id=5]
+content_margin_bottom = 67.0
+grow_begin = 0.0
+grow_end = 0.0
+thickness = 10
+
+[sub_resource type="StyleBoxLine" id=7]
+color = Color( 0.890196, 0.890196, 0.890196, 1 )
+thickness = 10
+
+[sub_resource type="StyleBoxLine" id=6]
+color = Color( 1, 1, 1, 1 )
+grow_begin = 0.0
+thickness = 10
+
+[sub_resource type="AtlasTexture" id=8]
+atlas = ExtResource( 1 )
+region = Rect2( 32, 160, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=9]
+atlas = ExtResource( 1 )
+region = Rect2( 48, 160, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=15]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 32, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=16]
+atlas = ExtResource( 1 )
+region = Rect2( 0, 32, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=17]
+atlas = ExtResource( 1 )
+region = Rect2( 16, 32, 16, 16 )
+
+[sub_resource type="AtlasTexture" id=18]
+atlas = ExtResource( 1 )
+region = Rect2( 16, 32, 16, 16 )
+
+[sub_resource type="StyleBoxFlat" id=10]
+bg_color = Color( 0, 0, 0, 1 )
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color( 0, 0, 0, 0 )
+border_blend = true
+corner_radius_top_left = 20
+corner_radius_top_right = 20
+corner_radius_bottom_right = 20
+corner_radius_bottom_left = 20
+
+[sub_resource type="AtlasTexture" id=11]
+atlas = ExtResource( 1 )
+region = Rect2( 1, 113, 14, 14 )
+
+[sub_resource type="AtlasTexture" id=12]
+atlas = ExtResource( 1 )
+region = Rect2( 33, 33, 14, 14 )
+
+[sub_resource type="AtlasTexture" id=13]
+atlas = ExtResource( 1 )
+region = Rect2( 33, 129, 14, 14 )
+
+[sub_resource type="AtlasTexture" id=14]
+atlas = ExtResource( 1 )
+region = Rect2( 1, 33, 14, 14 )
+
+[sub_resource type="StyleBoxFlat" id=19]
+bg_color = Color( 0, 0, 0, 1 )
+
+[sub_resource type="Theme" id=20]
+Panel/styles/panel = SubResource( 19 )
+
+[sub_resource type="GDScript" id=22]
+script/source = "extends Panel
+
+func event(hou:int, count:int, time:float, hou_time:float):
+	$Hou.text = str(hou) + \" / \" + str(count)
+	if hou >= count:
+		$Progress.texture_progress = load(\"res://Resources/progress_ok.png\")
+	else:
+		$Progress.texture_progress = load(\"res://Resources/progress.png\")
+	
+	printt(hou_time, time, hou_time == time)
+	var twee = create_tween().set_trans(Tween.TRANS_QUINT)
+	twee.tween_property($Progress, \"value\", 1000-((time-0.99)/(hou_time-0.99)*1000), 0.7)
+	
+	if hou_time == time:
+		var twe = create_tween().set_trans(Tween.TRANS_ELASTIC)
+		twe.tween_property(self, \"rect_position:y\", 20.0, 0.35)
+		twe.tween_property(self, \"rect_position:y\", 0.0, 0.35)
+		twe.play()
+"
+
+[sub_resource type="Animation" id=21]
+resource_name = "def"
+length = 2.0
+loop = true
+tracks/0/type = "value"
+tracks/0/path = NodePath("Title:text")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/keys = {
+"times": PoolRealArray( 0, 0.5, 1, 1.5, 2 ),
+"transitions": PoolRealArray( 1, 1, 1, 1, 1 ),
+"update": 1,
+"values": [ "Поиск игроков   ", "Поиск игроков.  ", "Поиск игроков.. ", "Поиск игроков...", "Поиск игроков   " ]
+}
+
+[node name="CanvasLayer" type="CanvasLayer"]
+script = SubResource( 4 )
+
+[node name="Control" type="Control" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ListOfActions" type="Control" parent="Control"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -502.0
+margin_top = -290.0
+margin_right = -278.0
+margin_bottom = -163.0
+rect_pivot_offset = Vector2( -10, -10 )
+script = ExtResource( 3 )
+
+[node name="ColorRect" type="Panel" parent="Control/ListOfActions"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+custom_styles/panel = SubResource( 1 )
+
+[node name="Attack" type="TextureButton" parent="Control/ListOfActions"]
+visible = false
+margin_left = 11.0
+margin_top = 12.5
+margin_right = 111.0
+margin_bottom = 112.5
+rect_pivot_offset = Vector2( 401, 36 )
+texture_normal = SubResource( 2 )
+expand = true
+
+[node name="SelectPos" type="TextureButton" parent="Control/ListOfActions"]
+margin_left = 11.0
+margin_top = 12.5
+margin_right = 111.0
+margin_bottom = 112.5
+rect_pivot_offset = Vector2( 401, 36 )
+texture_normal = SubResource( 23 )
+expand = true
+
+[node name="Give" type="TextureButton" parent="Control/ListOfActions"]
+visible = false
+margin_left = 111.0
+margin_top = 12.5
+margin_right = 211.0
+margin_bottom = 112.5
+rect_pivot_offset = Vector2( 401, 36 )
+texture_normal = SubResource( 3 )
+expand = true
+
+[node name="Scroll" type="ColorRect" parent="Control"]
+visible = false
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -377.0
+margin_top = -73.0
+color = Color( 0, 0, 0, 1 )
+
+[node name="HSlider" type="HSlider" parent="Control/Scroll"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -377.0
+margin_top = -73.0
+custom_styles/slider = SubResource( 5 )
+custom_styles/grabber_area_highlight = SubResource( 7 )
+custom_styles/grabber_area = SubResource( 6 )
+value = 50.0
+
+[node name="ColorRect" type="ColorRect" parent="Control/Scroll"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_top = 18.0
+mouse_filter = 2
+color = Color( 0, 0, 0, 1 )
+
+[node name="Label" type="Label" parent="Control/Scroll"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_right = -251.0
+margin_bottom = -49.0
+rect_scale = Vector2( 3, 3 )
+text = "50"
+align = 1
+valign = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="Control"]
+margin_right = 120.0
+margin_bottom = 120.0
+rect_min_size = Vector2( 120, 0 )
+
+[node name="To Menu" type="TextureButton" parent="Control/VBoxContainer"]
+margin_right = 120.0
+margin_bottom = 120.0
+rect_min_size = Vector2( 0, 120 )
+texture_normal = SubResource( 8 )
+texture_pressed = SubResource( 9 )
+expand = true
+
+[node name="Control" type="Control" parent="Control/VBoxContainer"]
+margin_top = 124.0
+margin_right = 120.0
+margin_bottom = 174.0
+rect_min_size = Vector2( 0, 50 )
+
+[node name="Plus" type="TextureButton" parent="Control/VBoxContainer"]
+margin_top = 178.0
+margin_right = 120.0
+margin_bottom = 298.0
+rect_min_size = Vector2( 0, 120 )
+texture_normal = SubResource( 15 )
+texture_pressed = SubResource( 16 )
+expand = true
+script = ExtResource( 5 )
+
+[node name="Minus" type="TextureButton" parent="Control/VBoxContainer"]
+margin_top = 302.0
+margin_right = 120.0
+margin_bottom = 422.0
+rect_min_size = Vector2( 0, 120 )
+texture_normal = SubResource( 17 )
+texture_pressed = SubResource( 18 )
+expand = true
+script = ExtResource( 6 )
+
+[node name="Buttons" type="Control" parent="Control"]
+margin_right = 40.0
+margin_bottom = 40.0
+
+[node name="Reqs" type="ScrollContainer" parent="Control"]
+anchor_left = 1.0
+anchor_right = 1.0
+margin_left = -244.0
+margin_top = 5.0
+margin_right = -2.0
+margin_bottom = 205.0
+
+[node name="Box" type="VBoxContainer" parent="Control/Reqs"]
+visible = false
+margin_right = 230.0
+margin_bottom = 200.0
+rect_min_size = Vector2( 230, 200 )
+
+[node name="*Sample" type="Panel" parent="Control/Reqs/Box"]
+visible = false
+margin_right = 230.0
+margin_bottom = 90.0
+rect_min_size = Vector2( 0, 90 )
+custom_styles/panel = SubResource( 10 )
+script = ExtResource( 4 )
+
+[node name="AvatarMode" type="TextureRect" parent="Control/Reqs/Box/*Sample"]
+margin_left = 15.0
+margin_top = 25.0
+margin_right = 75.0
+margin_bottom = 85.0
+rect_pivot_offset = Vector2( 120, -46 )
+texture = ExtResource( 2 )
+expand = true
+
+[node name="Hou" type="Label" parent="Control/Reqs/Box/*Sample"]
+margin_left = 86.0
+margin_top = 50.0
+margin_right = 128.0
+margin_bottom = 62.0
+rect_scale = Vector2( 3, 3 )
+text = "213"
+align = 1
+valign = 1
+
+[node name="Recipient" type="Label" parent="Control/Reqs/Box/*Sample"]
+margin_left = 1.0
+margin_top = 1.0
+margin_right = 47.0
+margin_bottom = 13.0
+rect_scale = Vector2( 2, 2 )
+text = "Мирно "
+align = 2
+valign = 1
+
+[node name="Stop" type="TextureButton" parent="Control/Reqs/Box/*Sample"]
+margin_left = 94.0
+margin_top = 4.0
+margin_right = 139.0
+margin_bottom = 49.0
+texture_normal = SubResource( 11 )
+texture_pressed = SubResource( 12 )
+expand = true
+
+[node name="Bust" type="TextureButton" parent="Control/Reqs/Box/*Sample"]
+margin_left = 157.0
+margin_top = 4.0
+margin_right = 202.0
+margin_bottom = 49.0
+texture_normal = SubResource( 13 )
+texture_pressed = SubResource( 14 )
+expand = true
+
+[node name="Panel" type="Node2D" parent="Control/Reqs"]
+
+[node name="Panel" type="Panel" parent="Control/Reqs/Panel"]
+margin_right = 230.0
+margin_bottom = 59.0
+rect_min_size = Vector2( 230, 59 )
+theme = SubResource( 20 )
+script = SubResource( 22 )
+
+[node name="Progress" type="TextureProgress" parent="Control/Reqs/Panel/Panel"]
+margin_top = 30.0
+margin_right = 230.0
+margin_bottom = 59.0
+max_value = 1000.0
+value = 533.0
+texture_progress = ExtResource( 7 )
+nine_patch_stretch = true
+
+[node name="Hou" type="Label" parent="Control/Reqs/Panel/Panel"]
+margin_top = 30.0
+margin_right = 92.0
+margin_bottom = 42.0
+rect_scale = Vector2( 2.5, 2.5 )
+text = "0 / 10"
+align = 1
+valign = 1
+
+[node name="Title" type="Label" parent="Control/Reqs/Panel/Panel"]
+margin_top = 2.0
+margin_right = 115.0
+margin_bottom = 14.0
+rect_scale = Vector2( 2, 2 )
+text = "Поиск игроков.  "
+align = 1
+valign = 1
+
+[node name="Animation" type="AnimationPlayer" parent="Control/Reqs/Panel/Panel"]
+autoplay = "def"
+anims/def = SubResource( 21 )
+
+[connection signal="pressed" from="Control/ListOfActions/Attack" to="Control/ListOfActions" method="attack"]
+[connection signal="pressed" from="Control/ListOfActions/SelectPos" to="Control/ListOfActions" method="select_pos"]
+[connection signal="pressed" from="Control/ListOfActions/Give" to="Control/ListOfActions" method="give"]
+[connection signal="value_changed" from="Control/Scroll/HSlider" to="." method="changed"]
+[connection signal="pressed" from="Control/VBoxContainer/To Menu" to="." method="_pressed"]
+[connection signal="pressed" from="Control/Reqs/Box/*Sample/Stop" to="Control/Reqs/Box/*Sample" method="stop_pressed"]
+[connection signal="pressed" from="Control/Reqs/Box/*Sample/Bust" to="Control/Reqs/Box/*Sample" method="bust_pressed"]
